@@ -1,0 +1,22 @@
+{
+  "name": "eastwood/log",
+  "keywords": ["log"],
+  "description": "",
+  "minimum-stability": "stable",
+  "license": "MIT",
+  "type": "library",
+  "authors": [
+    {
+      "name": "eastwood",
+      "email": "boss@haowei.me"
+    }
+  ],
+  "require": {
+    "php": ">=5.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "eastwood\\Log\\": "src/"
+    }
+  }
+}
