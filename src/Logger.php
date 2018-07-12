@@ -9,7 +9,7 @@ namespace EastWood\Log;
  * @method static error(string $tag, string $message)
  * @method static debug(string $tag, string $message)
  * @method static verbose(string $tag, string $message)
- * @method static set(string $name, mixed $value)
+ * @method static set(mixed $name, mixed $value = null)
  * @method static reset()
  *
  */
@@ -19,23 +19,14 @@ class Logger
 
     /**
      * load settings
+     * @throws \ErrorException
      * @return array
      */
     public static function load()
     {
-        $settings = [];
-        if (empty(static::$settings['default'])) {
-            static::$settings['default'] = [
-                'path' => env('EW_LOG_PATH', '/data1/logs'),
-                'rotate' => env('EW_LOG_ROTATE', 'daily'),
-                'application' => env('EW_LOG_APPLICATION', 'web')
-            ];
-        }
-
-        foreach (static::$settings['default'] as $name => $value)
-            $settings[$name] = isset(static::$settings['user'][$name]) ? static::$settings['user'][$name] : $value;
-
-        return $settings;
+        if (empty(static::$settings))
+            throw new \ErrorException('EastWood Log loading configuration error');
+        return static::$settings;
     }
 
     /**
@@ -52,7 +43,7 @@ class Logger
         $path = implode('/', [$settings['path'], $settings['application']]);
 
         if (!is_dir($path)) {
-            if (!@mkdir($path, 0777, true)) {
+            if (!@mkdir($path, 0755, true)) {
                 throw new \ErrorException('EastWood Log directory creation failed ' . $path);
             }
         }
@@ -110,19 +101,11 @@ class Logger
                 return call_user_func_array(['self', 'factory'], $arguments);
                 break;
             case 'set':
-                static::load();
-                if (is_array($arguments[0])) {
-                    foreach ($arguments[0] as $attr => $newValue) {
-                        if (array_key_exists($attr, static::$settings['default'])) static::$settings['user'][$attr] = $newValue;
-                    }
-                } else {
-                    if (isset(static::$settings['default'][$arguments[0]]))
-                        static::$settings['user'][$arguments[0]] = isset($arguments[1]) ? $arguments[1] : null;
-                }
+
                 return true;
                 break;
             case 'reset':
-                static::$settings['user'] = [];
+                static::$settings = [];
                 return true;
                 break;
             default:
