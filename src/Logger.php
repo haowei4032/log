@@ -101,7 +101,7 @@ class Logger
                 return call_user_func_array(['self', 'factory'], $arguments);
                 break;
             case 'set':
-
+                list(static::$settings) = $arguments;
                 return true;
                 break;
             case 'reset':
