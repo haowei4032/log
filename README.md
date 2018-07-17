@@ -10,6 +10,29 @@ Installation
 composer require eastwood/log
 ```
 
+Log level
+------------
+- info
+- warning
+- error
+- debug
+- verbose
+
+Log format variable
+------------
+- message
+- date_rfc (default)
+- unixtime
+- application
+- verb
+- host
+- uri
+- tag
+- level
+- ...
+
+You can call method Logger::getVariable() show varabile list
+
 
 
 Example
