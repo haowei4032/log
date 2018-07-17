@@ -39,9 +39,12 @@ class Logger
     public static function getVariable()
     {
         $variable = [
-            'date' => function ($format = 'r') {
-                return date($format);
-            },
+            'date' => [
+                'pattern' => '#{(<date>\((.+)\))}#',
+                'callback' => function ($format = 'r') {
+                    return date($format);
+                }
+            ],
             'date_rfc2822' => date('r'),
             'timestamp' => microtime(true),
             'unixtime' => time(),
@@ -120,32 +123,33 @@ class Logger
         $output['path'] = implode(DIRECTORY_SEPARATOR, [$path, $filename]);
         $varable = static::getVariable();
         foreach ($varable as $name => $value) {
-            switch ($name) {
-                case 'tag':
-                    $value = $tag;
-                    break;
-                case 'level':
-                    $value = $level;
-                    break;
-                case 'app':
-                case 'application':
-                    $value = static::$settings['application'];
-                    break;
-                case 'message':
-                    $value = $message;
-                    break;
-                case 'date':
-                    $hit = preg_match('#{(<date>\((.+)\))}#', $output['message'], $match);
-                    if ($hit) {
-                        list(, $name, $format) = $match;
-                        $value = $value($format);
-                    } else {
-                        continue 2;
-                    }
-                    break;
+            if (is_array($value)) {
+                if (preg_match($value['pattern'], $output['message'], $match)) {
+                    list($nil, $name) = $match;
+                    unset($nil, $match[0], $match[1]);
+                    $value = call_user_func_array($value['callback'], $match);
+                    $output['message'] = str_replace('{' . $name . '}', $value, $output['message']);
+                }
+            } else {
+                switch ($name) {
+                    case 'app':
+                    case 'application':
+                        $value = $settings['application'];
+                        break;
+                    case 'level':
+                        $value = $level;
+                        break;
+                    case 'tag':
+                        $value = $tag;
+                        break;
+                    case 'message':
+                        $value = $message;
+                        break;
+                }
+                $output['message'] = str_replace('{' . $name . '}', $value, $output['message']);
             }
-            $output['message'] = str_replace('{' . $name . '}', $value, $output['message']);
         }
+
         return file_put_contents($output['path'], $output['message'] . PHP_EOL, FILE_APPEND);
     }
 

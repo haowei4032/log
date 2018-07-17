@@ -8,7 +8,7 @@ Logger::set([
     'path' => '/data1/logs',
     'rotate' => 'daily',
     'application' => 'web',
-    'format' => '{date_rfc}||{timestamp}||{application}||{verb}||{host}||{uri}||{level}||{tag}||{message}'
+    'format' => '{message}||{<date>(Ymd)}'
 ]);
 
 //var_dump( Logger::getVariable() );
