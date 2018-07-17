@@ -1,7 +1,7 @@
 {
   "name": "eastwood/log",
   "keywords": ["log"],
-  "description": "",
+  "description": "A handy log tool",
   "minimum-stability": "stable",
   "license": "MIT",
   "type": "library",
